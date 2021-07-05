@@ -7,12 +7,12 @@ import validator from "validator";
 export default function AddContact(props) {
     let history = useHistory();
 
-    const add = async (values) => {
+    const add = (values) => {
         let newContact = {
             id: uuidv4(),
             name: values.name,
             email: values.email,
-            phone_num: values.phone_num,
+            phone_num: parseInt(values.phone_num),
         };
 
         if (values) {
@@ -23,11 +23,8 @@ export default function AddContact(props) {
 
     return (
         <>
-            <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ height: "80vh" }}
-            >
-                <div className="add-content bg-dark text-white">
+            <div className="container add d-flex justify-content-center align-items-center">
+                <div className="add-content bg-dark text-white mb-4">
                     <h3 className="text-center pb-3">Add Contact</h3>
 
                     <Form
@@ -75,7 +72,7 @@ export default function AddContact(props) {
                                     name="phone_num"
                                     className="form-control"
                                     id="exampleInputPhone_num"
-                                    placeholder="+919988776655"
+                                    placeholder="9988776655"
                                     validate={(value) =>
                                         !validator.isMobilePhone(value || "") &&
                                         "Please Enter valid Mobile Number "

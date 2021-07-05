@@ -14,7 +14,9 @@ body {
   background-size: cover;
   background-attachment: fixed;
 }
-
+.container.add.d-flex.justify-content-center.align-items-center {
+  margin-top: 50px;
+}
 .add-content {
   padding: 2rem;
   min-width: 40%;

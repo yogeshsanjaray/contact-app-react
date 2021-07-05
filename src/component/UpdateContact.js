@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useHistory } from "react-router";
 import axios from "axios";
 import validator from "validator";
+import { Form, Field } from "react-final-form";
 
 export default function UpdateContact(props) {
     let history = useHistory();
@@ -9,125 +10,155 @@ export default function UpdateContact(props) {
     // console.log(props)
     const { id, name, email, phone_num } = props.location.state.contact;
 
-    const [nameVal, setnameVal] = useState(name);
-    const [emailVal, setemailVal] = useState(email);
-    const [phoneVal, setphoneVal] = useState(phone_num);
-    const [message, setmessage] = useState(false);
-
-    const updateContact = async (e) => {
-        e.preventDefault();
-
+    const updateContact = (values) => {
         let updatedContact = {
             id: id,
-            name: nameVal,
-            email: emailVal,
-            phone_num: phoneVal,
+            name: values.name,
+            email: values.email,
+            phone_num: parseInt(values.phone_num),
         };
+        // console.log(updatedContact);
 
-        if (
-            nameVal.length !== 0 &&
-            validator.isEmail(emailVal || "") &&
-            validator.isMobilePhone(phoneVal || "")
-        ) {
-            props.setContacts(
-                props.contacts.map((contact) => {
-                    return contact.id === id ? { ...updatedContact } : contact;
-                })
-            );
-            setnameVal("");
-            setemailVal("");
-            history.push("/");
-        } else {
-            setmessage(true);
-        }
+        props.setContacts(
+            props.contacts.map((contact) => {
+                return contact.id === id ? { ...updatedContact } : contact;
+            })
+        );
+
+        history.push("/");
     };
 
     return (
         <>
-            <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ height: "80vh" }}
-            >
-                <div className="add-content bg-dark text-white">
+            <div className="container add d-flex justify-content-center align-items-center">
+                <div className="add-content bg-dark text-white mb-4">
                     <h3 className="text-center pb-3">Update Contact</h3>
-                    <form onSubmit={updateContact}>
-                        <div className="form-group mb-3">
-                            <h6
-                                htmlFor="exampleInputName"
-                                className="form-label ml-2"
-                            >
-                                Name
-                            </h6>
-                            <input
-                                type="text"
-                                name="name"
-                                className="form-control"
-                                id="exampleInputName"
-                                value={nameVal}
-                                onChange={(e) => setnameVal(e.target.value)}
-                            />
-                            <div className="form-text mt-2 text-danger">
-                                {message ? <span>Name is Required</span> : ""}
-                            </div>
-                        </div>
-                        <div className="form-group mb-3">
-                            <h6
-                                htmlFor="exampleInputEmail1"
-                                className="form-label"
-                            >
-                                Mobile Number
-                            </h6>
-                            <input
-                                type="text"
-                                name="phone_num"
-                                className="form-control"
-                                id="exampleInputName"
-                                value={phoneVal}
-                                onChange={(e) => setphoneVal(e.target.value)}
-                            />
-                            <div className="form-text mt-2 text-danger">
-                                {message ? (
-                                    <span>
-                                        Please Enter valid Mobile Number
-                                    </span>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
-                        </div>
-                        <div className="form-group mb-3">
-                            <h6
-                                htmlFor="exampleInputEmail1"
-                                className="form-label"
-                            >
-                                Email
-                            </h6>
-                            <input
-                                type="email"
-                                name="email"
-                                className="form-control"
-                                id="exampleInputEmail1"
-                                value={emailVal}
-                                onChange={(e) => setemailVal(e.target.value)}
-                            />
-                            <div className="form-text mt-2 text-danger">
-                                {message ? (
-                                    <span>Please Enter valid Email</span>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
-                        </div>
 
-                        <div className="button-field d-flex justify-content-center">
-                            <button
-                                type="submit"
-                                className="btn btn-warning px-5 mt-2"
-                            >
-                                Update
-                            </button>
-                        </div>
-                    </form>
+                    <Form
+                        onSubmit={updateContact}
+                        subscription={{
+                            submitted: true,
+                        }}
+                        initialValues={{
+                            name: name,
+                            email: email,
+                            phone_num: phone_num,
+                        }}
+                    >
+                        {({ handleSubmit, submitting, values }) => (
+                            <form onSubmit={handleSubmit}>
+                                <Field
+                                    type="text"
+                                    name="name"
+                                    className="form-control"
+                                    id="exampleInputName"
+                                    placeholder="abc"
+                                    validate={(value) =>
+                                        value ? undefined : "Name is Required "
+                                    }
+                                >
+                                    {({ input, meta, placeholder }) => (
+                                        <div className="form-group mb-3">
+                                            <h6
+                                                htmlFor="exampleInputName"
+                                                className="form-label ml-2"
+                                            >
+                                                Name
+                                            </h6>
+                                            <input
+                                                {...input}
+                                                placeholder={placeholder}
+                                            />
+
+                                            <div className="form-text text-warning">
+                                                {meta.error && meta.touched && (
+                                                    <span>{meta.error}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Field>
+
+                                <Field
+                                    type="text"
+                                    name="phone_num"
+                                    className="form-control"
+                                    id="exampleInputPhone_num"
+                                    placeholder="9988776655"
+                                    validate={(value) =>
+                                        value
+                                            ? !validator.isMobilePhone(
+                                                  value.toString() || ""
+                                              ) &&
+                                              "Please Enter valid Mobile Number "
+                                            : " "
+                                    }
+                                >
+                                    {({ input, meta, placeholder }) => (
+                                        <div className="form-group mb-3">
+                                            <h6
+                                                htmlFor="exampleInputPhone_num"
+                                                className="form-label"
+                                            >
+                                                Mobile Number
+                                            </h6>
+                                            <input
+                                                {...input}
+                                                placeholder={placeholder}
+                                            />
+
+                                            <div className="form-text text-warning">
+                                                {meta.error && meta.touched && (
+                                                    <span>{meta.error}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Field>
+                                <Field
+                                    type="email"
+                                    name="email"
+                                    className="form-control"
+                                    id="exampleInputEmail1"
+                                    placeholder="abc@gmail.com"
+                                    validate={(value) =>
+                                        !validator.isEmail(value || "") &&
+                                        "Plese Enter valid Email "
+                                    }
+                                >
+                                    {({ input, meta, placeholder }) => (
+                                        <div className="form-group mb-3">
+                                            <h6
+                                                htmlFor="exampleInputEmail1"
+                                                className="form-label"
+                                            >
+                                                Email
+                                            </h6>
+                                            <input
+                                                {...input}
+                                                placeholder={placeholder}
+                                            />
+
+                                            <div className="form-text text-warning">
+                                                {meta.error && meta.touched && (
+                                                    <span>{meta.error}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Field>
+                                <div className="button-field d-flex justify-content-center">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-success px-5 mt-2"
+                                        disabled={submitting}
+                                    >
+                                        Update
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </Form>
                 </div>
             </div>
         </>
